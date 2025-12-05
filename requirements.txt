@@ -1,0 +1,5 @@
+numpy
+pandas
+timm
+torch
+torchvision

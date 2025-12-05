@@ -1,0 +1,12 @@
+# MacOS
+.DS_Store
+
+# Python / IDE
+.idea/
+.venv/
+__pycache__/
+
+# Project
+/checkpoints/
+/configs/
+/data/
