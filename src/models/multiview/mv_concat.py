@@ -24,13 +24,14 @@ class MVConcatFusion(nn.Module):
             birads_classes: int = 5,
             density_classes: int = 4,
             proj_dim: int | None = None,
+            dropout: float = 0.1,
             backbone_kwargs: Optional[Dict] = None,
             head_kwargs: Optional[Dict] = None,
     ):
         super().__init__()
 
         # Get backbone (shared across 4 views)
-        # (B, in_chans, H, W) -> (B, feat_dim)
+        # (B, C, H, W) -> (B, F)
         backbone_kwargs = backbone_kwargs or {}
         self.backbone = get_backbone(
             backbone,
@@ -63,24 +64,31 @@ class MVConcatFusion(nn.Module):
             **head_kwargs,
         )
 
-    def encode_one(self, x: torch.Tensor) -> torch.Tensor:
-        # (B, 1, H, W) -> (B, F)
-        z = self.backbone(x)
-
-        if self.proj:
-            # (B, F) -> (B, proj_dim)
-            z = self.proj(z)
-        return z
-
     def forward(self, images: List[torch.Tensor]):
-        # (B, 1, H, W) -> (B, F)
-        feats = [self.encode_one(img) for img in images]
+        # Batch size
+        B = images[0].shape[0]
 
-        # List[(B, F)] -> (B, 4F)
-        fused = torch.cat(feats, dim=1)
+        # List[4 * (B, C, H, W)] -> (4B, C, H, W)
+        x = torch.cat(images, dim=0)
+
+        # (4B, C, H, W) -> (4B, F)
+        feats = self.backbone(x)
+
+        if self.proj is not None:
+            # (4B, F) -> (4B, D)
+            feats = self.proj(feats)
+
+        # (4B, D) -> (4, B, D)
+        feats = feats.view(4, B, -1)
+
+        # (4, B, D) -> (B, 4D)
+        fused = torch.cat(
+            [feats[i] for i in range(4)],
+            dim=1
+        )
 
         # Randomly assign 10% features to 0
         fused = self.drop(fused)
 
-        # (B, 4F) -> {breast_birads: {logits: (B, 5)}, breast_density: {logits: (B, 4)}}
+        # (B, 4D) -> {breast_birads: {logits: (B, 5)}, breast_density: {logits: (B, 4)}}
         return self.head(fused)

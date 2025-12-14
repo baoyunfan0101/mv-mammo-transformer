@@ -21,7 +21,6 @@ from config import BBOX_PATH
 def update_bbox(
         *,
         target_size: Tuple[int, int] = (2560, 1440),
-        image_size: Tuple[int, int] = (224, 224),
 ):
     status = Status()
     breast_level = BreastLevel()
@@ -29,6 +28,7 @@ def update_bbox(
     finding = Finding()
 
     bbox = BBox.build(bbox_path=BBOX_PATH)
+    image_size = bbox.get_image_size()
 
     with bbox.bbox() as bm:
         all_dict = finding.by_index.get_all()

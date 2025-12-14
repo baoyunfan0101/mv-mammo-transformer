@@ -46,7 +46,7 @@ class SwinBackbone(BackboneBase):
         self.out_dim = self.model.num_features
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # (B, in_chans, H, W) -> (B, H', W', F)
+        # (B, C, H, W) -> (B, H', W', F)
         x = self.patch_embed(x)
 
         # (B, H', W', F) -> (B, H', W', F)

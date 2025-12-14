@@ -24,6 +24,7 @@ DEFAULT_COLUMN_VALUES = {
     "xmax": -1,
     "ymax": -1,
 }
+IMAGE_SIZE = (224, 224)
 
 
 class BBox:
@@ -31,9 +32,11 @@ class BBox:
             self,
             bbox_path: str = BBOX_PATH,
             columns: List[str] = BBOX_COLUMNS,
+            image_size: Tuple[int, int] = (224, 224),
     ):
         self.bbox_path = bbox_path
         self.columns = list(columns)
+        self.image_size = image_size
         self.bbox_df = self._load_bbox()
 
         self.by_index = self._build_map()
@@ -157,6 +160,9 @@ class BBox:
         )
 
         self.save()
+
+    def get_image_size(self) -> Tuple[int, int]:
+        return self.image_size
 
     def get_study_ids(self) -> List[str]:
         return self.bbox_df["study_id"].unique().tolist()

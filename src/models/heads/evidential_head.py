@@ -23,7 +23,7 @@ class EvidentialHead(nn.Module):
     ):
         super().__init__()
 
-        # (B, in_dim) -> (B, 512) -> (B, num_classes)
+        # (B, D) -> (B, hidden) -> (B, num_classes)
         self.net = nn.Sequential(
             nn.Linear(in_dim, hidden),
             nn.ReLU(True),
@@ -32,7 +32,7 @@ class EvidentialHead(nn.Module):
         )
 
     def forward(self, feats: torch.Tensor) -> Dict[str, torch.Tensor]:
-        # (B, in_dim) -> (B, num_classes)
+        # (B, D) -> (B, num_classes)
         logits = self.net(feats)
         evidence = F.softplus(logits)
         alpha = evidence + 1.0

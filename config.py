@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 # Detect runtime environment
 if "COLAB_GPU" in os.environ or os.path.isdir("/content"):
     ENV = "colab"
+elif os.path.exists("/home/ubuntu") or os.environ.get("AWS_EXECUTION_ENV"):
+    ENV = "aws"
 else:
     home = os.path.expanduser("~")
     if "yunfan" in home.lower() or "MacBook" in os.uname().nodename:

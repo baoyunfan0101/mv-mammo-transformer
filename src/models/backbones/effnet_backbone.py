@@ -48,7 +48,7 @@ class EffNetV2SBackbone(BackboneBase):
             new_conv.weight.data = old_conv.weight.mean(dim=1, keepdim=True)
             model.features[0][0] = new_conv
 
-        # Backbone body: (B, in_chans, H, W) -> (B, F, H', W'), F = 1280
+        # Backbone body: (B, C, H, W) -> (B, F, H', W'), F = 1280
         self.body = model.features
 
         # (B, F, H', W') -> (B, F, 1, 1)
@@ -58,7 +58,7 @@ class EffNetV2SBackbone(BackboneBase):
         self.out_dim = 1280
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # (B, in_chans, H, W) -> (B, F, H', W')
+        # (B, C, H, W) -> (B, F, H', W')
         feats = self.body(x)
 
         # (B, F, H', W') -> (B, F, 1, 1) -> (B, F)

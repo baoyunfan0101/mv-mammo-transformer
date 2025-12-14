@@ -17,7 +17,7 @@ Ziyuan Zhang
 ## Installation
 
 ```bash
-git clone https://github.com/USERNAME/mv-mammo-transformer.git
+git clone https://github.com/baoyunfan0101/mv-mammo-transformer.git
 cd mv-mammo-transformer
 pip install -r requirements.txt
 ```
@@ -308,6 +308,7 @@ mv-mammo-transformer/
 ## Entry Points
 
 ### Training
+notebooks/local_train_template.ipynb
 notebooks/colab_train_template.ipynb
 
 ### Evaluation

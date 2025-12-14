@@ -47,7 +47,7 @@ class ResNet50Backbone(BackboneBase):
             new_conv.weight.data = old_conv.weight.mean(dim=1, keepdim=True)
             model.conv1 = new_conv
 
-        # Backbone body: (B, in_chans, H, W) -> (B, F, H', W'), F = 2048
+        # Backbone body: (B, C, H, W) -> (B, F, H', W'), F = 2048
         # Batch size: correspond to loss function
         # For a conv kernel (in_chans, kernel_h, kernel_w): output the sum of the convolution of all input channels
         # For a conv layer (out_chans, in_chans, kernel_h, kernel_w): number of conv kernels == number of output channels
@@ -74,7 +74,7 @@ class ResNet50Backbone(BackboneBase):
         self.out_dim = 2048
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # (B, in_chans, H, W) -> (B, F, H', W')
+        # (B, C, H, W) -> (B, F, H', W')
         feats = self.body(x)
 
         # (B, F, H', W') -> (B, F, 1, 1) -> (B, F)

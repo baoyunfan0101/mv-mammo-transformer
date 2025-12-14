@@ -23,14 +23,14 @@ class SoftmaxHead(nn.Module):
         # Randomly assign 10% features to 0
         self.dropout = nn.Dropout(dropout)
 
-        # (B, in_dim) -> (B, num_classes)
+        # (B, D) -> (B, num_classes)
         self.fc = nn.Linear(in_dim, num_classes)
 
     def forward(self, feats: torch.Tensor) -> Dict[str, torch.Tensor]:
         # Randomly assign 10% features to 0
         z = self.dropout(feats)
 
-        # (B, in_dim) -> (B, num_classes)
+        # (B, D) -> (B, num_classes)
         logits = self.fc(z)
         return {
             "logits": logits,

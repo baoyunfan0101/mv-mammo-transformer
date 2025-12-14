@@ -34,7 +34,7 @@ class MVTransformerFusion(nn.Module):
         super().__init__()
 
         # Get backbone (shared across 4 views)
-        # (B, in_chans, H, W) -> (B, feat_dim)
+        # (B, C, H, W) -> (B, F)
         backbone_kwargs = backbone_kwargs or {}
         self.backbone = get_backbone(
             backbone,
@@ -47,6 +47,7 @@ class MVTransformerFusion(nn.Module):
         self.proj = nn.Linear(feat_dim, token_dim)
 
         # Learnable view embedding for 4 views
+        # {0: (D,), 1: (D,), 2: (D,), 3: (D,)}
         self.view_embed = nn.Embedding(4, token_dim)
 
         # Transformer Encoder Layer
@@ -82,24 +83,29 @@ class MVTransformerFusion(nn.Module):
         # Batch size
         B = images[0].shape[0]
 
-        # For each view: (B, 1, H, W) -> (B, 2048) -> (B, D)
-        feats = [self.proj(self.backbone(img)) for img in images]
+        # List[4 * (B, C, H, W)] -> (4B, 1, H, W)
+        x = torch.cat(images, dim=0)
 
-        # 4 * (B, D) -> (B, 4, D)
-        tokens = torch.stack(feats, dim=1)  # (B,4,D)
+        # (4B, 1, H, W) -> (4B, F)
+        feats = self.backbone(x)
 
-        # [0, 1, 2, 3] -> [[0, 1, 2, 3]] -> [B * [0, 1, 2, 3]]
+        # (4B, F) -> (4B, D)
+        feats = self.proj(feats)
+
+        # (4B, D) -> (4, B, D) -> (B, 4, D)
+        tokens = feats.view(4, B, -1).permute(1, 0, 2)
+
+        # embedding -> List[embedding] -> List[B * embedding]
+        # (4,) -> (1, 4) -> (B, 4)
         pos_ids = torch.arange(4, device=tokens.device).unsqueeze(0).expand(B, 4)
 
-        # self.view_embed(pos[0][0]) = e[0]
-        # self.view_embed(pos[0]) = [e[0], e[1], e[2], e[3]]
-        # self.view_embed(pos): (B, 4, D)
+        # (B, 4, D) + (B, 4, D)
         tokens = tokens + self.view_embed(pos_ids)
 
         return tokens
 
     def forward(self, images: List[torch.Tensor]):
-        # (B, 1, H, W) -> (B, 4, D)
+        # List[4 * (B, C, H, W)] -> (B, 4, D)
         tokens = self._encode_views(images)
 
         # (B, 4, D) -> (B, 4, D)

@@ -133,17 +133,18 @@ def evaluate(
 
             gradcam = GradCAM(model)
 
-            cams = gradcam(
+            cams_batched = gradcam(
                 batch=batch,
                 task="breast_birads",
                 use_predicted_class=True,
             )
 
+            # squeeze batch dimension
             result["gradcam"] = {
                 "study_id": gradcam_study_id,
                 "key": batch["key"][0],
-                "images": batch["images"],
-                "cams": cams,
+                "images": [img[0] for img in batch["images"]],
+                "cams": [cam[0] for cam in cams_batched],
             }
 
             break
