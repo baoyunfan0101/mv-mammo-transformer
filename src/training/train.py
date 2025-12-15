@@ -4,11 +4,19 @@ from __future__ import annotations
 from typing import Dict, Callable, Optional
 
 import torch
-from torch.amp import GradScaler, autocast
 
 from src.losses import get_loss
 from src.training.forward import forward_batch
 from src.utils.device_utils import move_to_device
+
+try:
+    from torch.amp import autocast  # torch >= 2.1
+
+    AMP_DEVICE_KW = dict(device_type="cuda")
+except ImportError:
+    from torch.cuda.amp import autocast  # torch <= 2.0
+
+    AMP_DEVICE_KW = {}
 
 __all__ = ["train_one_epoch"]
 
@@ -42,7 +50,7 @@ def train_one_epoch(
         optimizer.zero_grad(set_to_none=True)
 
         if scaler is not None:
-            with autocast(device_type=device.type):
+            with autocast(**AMP_DEVICE_KW):
                 outputs = forward_batch(model, batch)
                 loss_dict = loss_fn(outputs, batch)
                 loss_total = loss_dict["total_loss"]

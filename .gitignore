@@ -10,3 +10,4 @@ __pycache__/
 /checkpoints/
 /configs/
 /data/
+/raw_data/

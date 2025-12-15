@@ -1,5 +1,7 @@
 numpy
 pandas
+python-dotenv
+huggingface_hub
 timm
 torch
 torchvision

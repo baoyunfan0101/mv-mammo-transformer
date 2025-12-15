@@ -18,6 +18,8 @@ else:
 # Use different .env files for different environments
 if ENV == "colab":
     env_path = os.path.join(os.path.dirname(__file__), ".env.colab")
+elif ENV == "aws":
+    env_path = os.path.join(os.path.dirname(__file__), ".env.aws")
 else:
     env_path = os.path.join(os.path.dirname(__file__), ".env")
 

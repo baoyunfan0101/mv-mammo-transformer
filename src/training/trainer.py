@@ -4,13 +4,17 @@ from __future__ import annotations
 from typing import List, Dict, Any, Optional
 
 import torch
-from torch.amp import GradScaler
 from torch.utils.data import DataLoader
 
 from src.data.bbox import BBox
 from src.losses import get_loss
 from src.training.train import train_one_epoch
 from src.training.evaluate import evaluate_one_epoch
+
+try:
+    from torch.amp import GradScaler  # torch >= 2.1
+except ImportError:
+    from torch.cuda.amp import GradScaler  # torch <= 2.0
 
 
 class Trainer:

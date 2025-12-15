@@ -55,6 +55,7 @@ mv-mammo-transformer/
 ├── status.txt
 ├── status_colab.txt
 ├── .env
+├── .env.aws
 ├── .env.colab
 ├── config.py
 │
@@ -63,6 +64,7 @@ mv-mammo-transformer/
 │   ├── first_1000_overview.ipynb
 │   ├── full_overview.ipynb
 │   ├── local_evaluate_template.ipynb
+│   ├── local_train_template.ipynb
 │   └── local_visualize_preprocess.ipynb
 │
 ├── scripts/

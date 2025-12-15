@@ -54,8 +54,8 @@ if __name__ == "__main__":
     # update_download(status, IMG_ROOT)
     # update_download(status, "/Volumes/YUNFANSD/images")
 
-    # with status.preprocess() as pm:
-    #     pm.reset()
-    # update_preprocess(status, PROCESSED_DIR)
+    with status.preprocess() as pm:
+        pm.reset()
+    update_preprocess(status, PROCESSED_DIR)
 
     display_info(status)

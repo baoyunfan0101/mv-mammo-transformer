@@ -30,7 +30,7 @@ class SoftmaxGradCAMLoss:
     ):
         # Base loss
         self.base_loss = get_loss(
-            "softmax_ce",
+            "softmax_lsce",
             weights=weights,
             lambda_density=lambda_density,
             smoothing=smoothing,
